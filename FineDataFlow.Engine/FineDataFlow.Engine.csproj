@@ -3,6 +3,9 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Product>Fine Data Flow</Product>
+		<PackageProjectUrl>https://github.com/FortuneN/FineDataFlow.Engine</PackageProjectUrl>
 	</PropertyGroup>
 	
 	<ItemGroup>
