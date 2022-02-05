@@ -1,0 +1,45 @@
+﻿Introduction
+============
+
+The target audience is plugin developers.
+Plugin developers create plugins for the engine to execute.
+
+Plugins are :
+- Repositories
+- Steps
+- e.t.c
+
+Consider carefully what plugin developers should be allowed to 'see'.
+Less is better.
+
+IDeas
+=====
+- No built-in plugins (this is the engine only)
+- Use test implementations and mocks for unit testing
+- Host plugins in nuget
+- Enforce a naming convention e.g. (uniformity, easy to find in nuget or github)
+  - FineDataFlow.Engine.Step.Start
+  - FineDataFlow.Engine.Step.RabbitMQReader
+  - FineDataFlow.Engine.Step.RabbitMQWriter
+  - FineDataFlow.Engine.Step.DatabaseTableReader
+  - FineDataFlow.Engine.Step.DatabaseTableWriter
+  e.t.c
+- Http Endpoint Step
+- Azure Service Listener Bus Step
+- Grpc Endpoint Step
+- Websocket Reader Step
+- Websocket Writer Step
+- Azure Service Bus Reader Step
+- Azure Service Bus Writer Step
+- RabbitMQ Reader Step
+- RabbitMQ Writer Step
+- Environment Variables Reader
+- Environment Variables Writer
+- Running Processes Reader
+- Directory filenames Reader
+- SignalR Reader
+- SignalR Writer
+- Http Reader
+- Http Writer
+- Http Lookup
+- 
