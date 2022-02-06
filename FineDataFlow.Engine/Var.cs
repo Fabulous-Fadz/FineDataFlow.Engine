@@ -2,8 +2,8 @@
 {
 	public abstract class Var<T>
 	{
-		public string Text { get; set; }
-		public T Value { get; set; }
+		public string Text { get; internal set; }
+		public T Value { get; internal set; }
 		internal abstract void ParseText();
 		internal abstract void StringifyValue();
 	}
