@@ -1,6 +1,6 @@
-﻿namespace FineDataFlow.Engine.Options
+﻿namespace FineDataFlow.Engine.Vars
 {
-	public class LongVar : Var<long>
+	public class DecimalVar : Var<decimal>
 	{
 		internal override void ParseText()
 		{
@@ -9,7 +9,7 @@
 				return;
 			}
 
-			Value = long.Parse(Text);
+			Value = decimal.Parse(Text);
 		}
 
 		internal override void StringifyValue()

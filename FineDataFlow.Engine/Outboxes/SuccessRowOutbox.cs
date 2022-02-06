@@ -1,6 +1,6 @@
 ﻿namespace FineDataFlow.Engine.Outboxes
 {
-	public class RowSuccessOutbox : Outbox
+	public class SuccessRowOutbox : Outbox
 	{
 	}
 }

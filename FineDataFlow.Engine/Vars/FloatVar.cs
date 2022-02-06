@@ -1,6 +1,6 @@
-﻿namespace FineDataFlow.Engine.Options
+﻿namespace FineDataFlow.Engine.Vars
 {
-	public class ShortVar : Var<short>
+	public class FloatVar : Var<float>
 	{
 		internal override void ParseText()
 		{
@@ -9,7 +9,7 @@
 				return;
 			}
 
-			Value = short.Parse(Text);
+			Value = float.Parse(Text);
 		}
 
 		internal override void StringifyValue()

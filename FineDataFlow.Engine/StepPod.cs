@@ -75,7 +75,7 @@ namespace FineDataFlow.Engine
 
 			var rowErrorOutboxes = Outboxes
 				.AsParallel()
-				.Where(x => x is RowErrorOutbox)
+				.Where(x => x is ErrorRowOutbox)
 				.ToList();
 
 			Inboxes

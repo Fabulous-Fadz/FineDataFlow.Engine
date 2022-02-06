@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FineDataFlow.Engine.Options
+namespace FineDataFlow.Engine.Vars
 {
 	public class BooleanVar : Var<bool>
 	{

@@ -46,7 +46,7 @@ namespace FineDataFlow.Engine.Tests
 		class StartStep : Step
 		{
 			public SeedRowInbox SeedRowInbox { get; set; }
-			public RowSuccessOutbox RowSuccessOutbox { get; set; }
+			public SuccessRowOutbox SuccessRowOutbox { get; set; }
 
 			public override void Initialize()
 			{
@@ -55,7 +55,9 @@ namespace FineDataFlow.Engine.Tests
 
 			private void SeedRowInbox_OnRow(object sender, OnRowEventArgs e)
 			{
-				RowSuccessOutbox.AddRows(new(), new(), e.Row);
+				SuccessRowOutbox.AddRow(new());
+				SuccessRowOutbox.AddRow(new());
+				SuccessRowOutbox.AddRow(null);
 			}
 		}
 	}

@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks.Dataflow;
-using MoreLinq;
 
 namespace FineDataFlow.Engine
 {
@@ -17,7 +14,5 @@ namespace FineDataFlow.Engine
 		internal Outbox FromOutbox { get; set; }
 		internal ActionBlock<Row> ActionBlock { get; set; }
 		internal CancellationToken CancellationToken { get; set; }
-		internal void AddRows(IEnumerable<Row> rows) => rows?.ForEach(AddRow);
-		internal void AddRows(params Row[] rows) => AddRows(rows?.AsEnumerable());
 	}
 }

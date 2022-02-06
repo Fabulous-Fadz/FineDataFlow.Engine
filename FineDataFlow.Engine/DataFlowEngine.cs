@@ -43,8 +43,8 @@ namespace FineDataFlow.Engine
 			services.AddTransient<SeedRowInbox>();
 			services.AddTransient<AllRowsInbox>();
 			services.AddTransient<RowStreamInbox>();
-			services.AddTransient<RowErrorOutbox>();
-			services.AddTransient<RowSuccessOutbox>();
+			services.AddTransient<ErrorRowOutbox>();
+			services.AddTransient<SuccessRowOutbox>();
 			services.AddTransient<TransformationPod>();
 			services.AddTransient<StepCompleteOutbox>();
 			services.AddTransient<CancellationTokenSource>();

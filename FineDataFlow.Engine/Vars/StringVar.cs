@@ -1,4 +1,4 @@
-﻿namespace FineDataFlow.Engine.Options
+﻿namespace FineDataFlow.Engine.Vars
 {
 	public class StringVar : Var<string>
 	{

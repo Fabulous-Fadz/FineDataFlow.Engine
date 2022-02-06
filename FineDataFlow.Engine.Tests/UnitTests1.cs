@@ -39,7 +39,7 @@ namespace FineDataFlow.Engine.Tests
 
 			transformation1.Hops.Add(new Hop()
 			{
-				FromStepName = "Start", FromOutboxName = nameof(StartStep.RowSuccessOutbox),
+				FromStepName = "Start", FromOutboxName = nameof(StartStep.SuccessRowOutbox),
 				ToStepName = "Success", ToInboxName = nameof(SuccessStep.RowStreamInbox),
 			});
 
@@ -67,7 +67,7 @@ namespace FineDataFlow.Engine.Tests
 		class StartStep : Step
 		{
 			public SeedRowInbox SeedRowInbox { get; set; }
-			public RowSuccessOutbox RowSuccessOutbox { get; set; }
+			public SuccessRowOutbox SuccessRowOutbox { get; set; }
 
 			public override void Initialize()
 			{
@@ -76,14 +76,16 @@ namespace FineDataFlow.Engine.Tests
 
 			private void SeedRowInbox_OnRow(object sender, OnRowEventArgs e)
 			{
-				RowSuccessOutbox.AddRows(new(), new(), e.Row);
+				SuccessRowOutbox.AddRow(new());
+				SuccessRowOutbox.AddRow(new());
+				SuccessRowOutbox.AddRow(null);
 			}
 		}
 
 		class SuccessStep : Step
 		{
 			public RowStreamInbox RowStreamInbox { get; set; }
-			public RowSuccessOutbox RowSuccessOutbox { get; set; }
+			public SuccessRowOutbox RowSuccessOutbox { get; set; }
 
 			public override void Initialize()
 			{
@@ -99,7 +101,7 @@ namespace FineDataFlow.Engine.Tests
 		class ErrorStep : Step
 		{
 			public RowStreamInbox RowStreamInbox { get; set; }
-			public RowSuccessOutbox RowSuccessOutbox { get; set; }
+			public SuccessRowOutbox RowSuccessOutbox { get; set; }
 
 			public override void Initialize()
 			{
@@ -115,7 +117,7 @@ namespace FineDataFlow.Engine.Tests
 		class StepCompleteStep : Step
 		{
 			public RowStreamInbox RowStreamInbox { get; set; }
-			public RowSuccessOutbox RowSuccessOutbox { get; set; }
+			public SuccessRowOutbox RowSuccessOutbox { get; set; }
 
 			public override void Initialize()
 			{

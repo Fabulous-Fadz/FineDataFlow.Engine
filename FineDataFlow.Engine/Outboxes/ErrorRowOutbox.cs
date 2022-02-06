@@ -1,6 +1,6 @@
 ﻿namespace FineDataFlow.Engine.Outboxes
 {
-	internal class RowErrorOutbox : Outbox
+	internal class ErrorRowOutbox : Outbox
 	{
 	}
 }
