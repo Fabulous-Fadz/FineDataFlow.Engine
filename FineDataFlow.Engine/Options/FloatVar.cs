@@ -2,7 +2,7 @@
 {
 	public class FloatVar : Var<float>
 	{
-		public override void ParseText()
+		internal override void ParseText()
 		{
 			if (string.IsNullOrWhiteSpace(Text))
 			{
@@ -12,7 +12,7 @@
 			Value = float.Parse(Text);
 		}
 
-		public override void StringifyValue()
+		internal override void StringifyValue()
 		{
 			Text = Value.ToString();
 		}

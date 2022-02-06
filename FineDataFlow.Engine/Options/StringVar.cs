@@ -2,12 +2,12 @@
 {
 	public class StringVar : Var<string>
 	{
-		public override void ParseText()
+		internal override void ParseText()
 		{
 			Value = Text;
 		}
 
-		public override void StringifyValue()
+		internal override void StringifyValue()
 		{
 			Text = Value;
 		}

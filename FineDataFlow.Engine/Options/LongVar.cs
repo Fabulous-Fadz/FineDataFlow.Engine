@@ -2,7 +2,7 @@
 {
 	public class LongVar : Var<long>
 	{
-		public override void ParseText()
+		internal override void ParseText()
 		{
 			if (string.IsNullOrWhiteSpace(Text))
 			{
@@ -12,7 +12,7 @@
 			Value = long.Parse(Text);
 		}
 
-		public override void StringifyValue()
+		internal override void StringifyValue()
 		{
 			Text = Value.ToString();
 		}

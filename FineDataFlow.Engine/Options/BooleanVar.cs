@@ -4,7 +4,7 @@ namespace FineDataFlow.Engine.Options
 {
 	public class BooleanVar : Var<bool>
 	{
-		public override void ParseText()
+		internal override void ParseText()
 		{
 			if (string.IsNullOrWhiteSpace(Text))
 			{
@@ -19,7 +19,7 @@ namespace FineDataFlow.Engine.Options
 			Value = bool.Parse(Text);
 		}
 
-		public override void StringifyValue()
+		internal override void StringifyValue()
 		{
 			Text = Value.ToString();
 		}
