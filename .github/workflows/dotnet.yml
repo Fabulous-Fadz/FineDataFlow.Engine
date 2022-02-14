@@ -30,7 +30,7 @@ jobs:
     #  run: dotnet test --no-build --verbosity normal
       
     - name: Publish Abstractions (on version change)
-      id  : FineDataFlow.Engine.Abstractions
+      id  : fine_dataflow_engine_abstractions
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: FineDataFlow.Engine.Abstractions/10.FineDataFlow.Engine.Abstractions.csproj
@@ -39,7 +39,7 @@ jobs:
         INCLUDE_SYMBOLS: false
 
     - name: Publish Main (on version change)
-      id  : FineDataFlow.Engine
+      id  : fine_dataflow_engine
       uses: rohith/publish-nuget@v2
       with:
         PROJECT_FILE_PATH: FineDataFlow.Engine/30.FineDataFlow.Engine.csproj
