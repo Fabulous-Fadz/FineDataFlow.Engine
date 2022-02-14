@@ -29,7 +29,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\FineDataFlow.Engine.Internal\20.FineDataFlow.Engine.csproj" />
 	  <ProjectReference Include="..\FineDataFlow.Engine\20.FineDataFlow.Engine.csproj" />
 	</ItemGroup>
 
