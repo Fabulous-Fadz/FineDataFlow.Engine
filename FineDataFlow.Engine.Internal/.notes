@@ -1,7 +1,0 @@
-﻿- Probably should be per run/start and not a permanent property
-- IEngineEventsEmitter
-  -> SignalrEventsEmitter
-  -> FileEventsEmitter
-  -> LogEventsEmitter
-  -> DatabaseEventEmitter
-  -> e.t.c

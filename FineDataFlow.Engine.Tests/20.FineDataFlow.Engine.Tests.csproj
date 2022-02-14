@@ -4,8 +4,8 @@
 		<IsPackable>false</IsPackable>
 		<LangVersion>latest</LangVersion>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<AssemblyName>FineDataFlow.Engine.Abstractions.Tests</AssemblyName>
-		<RootNamespace>FineDataFlow.Engine.Abstractions.Tests</RootNamespace>
+		<AssemblyName>FineDataFlow.Engine.Tests</AssemblyName>
+		<RootNamespace>FineDataFlow.Engine.Tests</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -17,6 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="LightBDD.NUnit3" Version="3.4.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
@@ -28,7 +29,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\FineDataFlow.Engine.Abstractions\10.FineDataFlow.Engine.Abstractions.csproj" />
+	  <ProjectReference Include="..\FineDataFlow.Engine.Internal\20.FineDataFlow.Engine.csproj" />
+	  <ProjectReference Include="..\FineDataFlow.Engine\20.FineDataFlow.Engine.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Plugins\.ignore">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

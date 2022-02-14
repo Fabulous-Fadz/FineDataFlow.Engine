@@ -1,7 +1,6 @@
 ﻿using FineDataFlow.Engine.Abstractions;
 using FineDataFlow.Engine.Abstractions.Models;
-using FineDataFlow.Engine.Internal;
-using FineDataFlow.Engine.Internal.Impl;
+using FineDataFlow.Engine.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
