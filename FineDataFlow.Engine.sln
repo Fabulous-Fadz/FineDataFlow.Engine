@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "30.FineDataFlow.Engine.Tests", "FineDataFlow.Engine.Tests\30.FineDataFlow.Engine.Tests.csproj", "{C3A1150D-4971-4B4D-864F-2E886DD8C3AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "20.FineDataFlow.Engine.Tests", "FineDataFlow.Engine.Tests\20.FineDataFlow.Engine.Tests.csproj", "{C3A1150D-4971-4B4D-864F-2E886DD8C3AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "10.FineDataFlow.Engine.Abstractions", "FineDataFlow.Engine.Abstractions\10.FineDataFlow.Engine.Abstractions.csproj", "{33DBBD8A-4177-4432-A1DE-EFFF3E864D4A}"
 EndProject
@@ -13,11 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3E65AB2C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "10.FineDataFlow.Engine.Abstractions.Tests", "FineDataFlow.Engine.Abstractions.Tests\10.FineDataFlow.Engine.Abstractions.Tests.csproj", "{69535F16-112D-4B16-93C9-AC42AAA42EA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "20.FineDataFlow.Engine.Internal", "FineDataFlow.Engine.Internal\20.FineDataFlow.Engine.Internal.csproj", "{095F32F2-C8EA-410E-AA0A-F7B86D88ADB4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "30.FineDataFlow.Engine", "FineDataFlow.Engine\30.FineDataFlow.Engine.csproj", "{48C53A21-BCDB-4562-B259-878DAD615275}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "20.FineDataFlow.Engine.Internal.Tests", "FineDataFlow.Engine.Internal.Tests\20.FineDataFlow.Engine.Internal.Tests.csproj", "{9495FEF4-49EF-4CC6-9664-824EDF648C2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "20.FineDataFlow.Engine", "FineDataFlow.Engine\20.FineDataFlow.Engine.csproj", "{095F32F2-C8EA-410E-AA0A-F7B86D88ADB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,14 +37,6 @@ Global
 		{095F32F2-C8EA-410E-AA0A-F7B86D88ADB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{095F32F2-C8EA-410E-AA0A-F7B86D88ADB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{095F32F2-C8EA-410E-AA0A-F7B86D88ADB4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{48C53A21-BCDB-4562-B259-878DAD615275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48C53A21-BCDB-4562-B259-878DAD615275}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48C53A21-BCDB-4562-B259-878DAD615275}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48C53A21-BCDB-4562-B259-878DAD615275}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9495FEF4-49EF-4CC6-9664-824EDF648C2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9495FEF4-49EF-4CC6-9664-824EDF648C2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9495FEF4-49EF-4CC6-9664-824EDF648C2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9495FEF4-49EF-4CC6-9664-824EDF648C2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,8 +46,6 @@ Global
 		{33DBBD8A-4177-4432-A1DE-EFFF3E864D4A} = {17153431-A836-4410-8AAA-82664703FF82}
 		{69535F16-112D-4B16-93C9-AC42AAA42EA9} = {3E65AB2C-60F9-4154-B0CC-B202D34F0593}
 		{095F32F2-C8EA-410E-AA0A-F7B86D88ADB4} = {17153431-A836-4410-8AAA-82664703FF82}
-		{48C53A21-BCDB-4562-B259-878DAD615275} = {17153431-A836-4410-8AAA-82664703FF82}
-		{9495FEF4-49EF-4CC6-9664-824EDF648C2F} = {3E65AB2C-60F9-4154-B0CC-B202D34F0593}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7113CD6E-B6C0-464E-9FB8-8F60498E6946}
