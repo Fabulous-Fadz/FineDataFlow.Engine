@@ -1,133 +1,133 @@
-using FineDataFlow.Engine.Inboxes;
-using FineDataFlow.Engine.Outboxes;
-using NUnit.Framework;
+//using FineDataFlow.Engine;
+//using FineDataFlow.Engine.EventArgz;
+//using FineDataFlow.Engine.Inboxes;
+//using FineDataFlow.Engine.Outboxes;
+//using NUnit.Framework;
 
-namespace FineDataFlow.Engine.Tests
-{
-	public class UnitTests1
-	{
-		DataFlowEngine _engine;
+//namespace FineDataFlow.Engine.Tests
+//{
+//	public class UnitTests1
+//	{
+//		DataFlowEngine _engine;
 
-		[SetUp]
-		public void SetUp()
-		{
-			_engine = new DataFlowEngine();
-		}
+//		[SetUp]
+//		public void SetUp()
+//		{
+//			_engine = new DataFlowEngine();
+//		}
 
-		[TearDown]
-		public void TearDown()
-		{
-			_engine.Dispose();
-		}
+//		[TearDown]
+//		public void TearDown()
+//		{
+//			_engine.Dispose();
+//		}
 
-		[Test]
-		public void Test1()
-		{
-			// arrange
+//		[Test]
+//		public void Test1()
+//		{
+//			// arrange
 
-			var repository1 = new Repository();
-			repository1.Name = "Repository1";
+//			var app1 = new AppImpl();
+//			app1.Name = "App1";
 			
-			var transformation1 = new Transformation();
-			transformation1.Name = "Transformation1";
-			repository1.Transformations.Add(transformation1);
+//			var flow1 = new FlowImpl();
+//			flow1.Name = "Flow1";
+//			app1.Flows.Add(flow1);
 
-			transformation1.Steps.Add(new StartStep() { Name = "Start" });
-			transformation1.Steps.Add(new SuccessStep() { Name = "Success" });
-			transformation1.Steps.Add(new ErrorStep() { Name = "Error" });
-			transformation1.Steps.Add(new StepCompleteStep() { Name = "StepComplete" });
+//			flow1.Steps.Add(new StartStep() { Name = "Start" });
+//			flow1.Steps.Add(new SuccessStep() { Name = "Success" });
+//			flow1.Steps.Add(new ErrorStep() { Name = "Error" });
+//			flow1.Steps.Add(new StepCompleteStep() { Name = "StepComplete" });
 
-			transformation1.Hops.Add(new Hop()
-			{
-				FromStepName = "Start", FromOutboxName = nameof(StartStep.SuccessRowOutbox),
-				ToStepName = "Success", ToInboxName = nameof(SuccessStep.RowStreamInbox),
-			});
+//			flow1.Hops.Add(new HopImpl()
+//			{
+//				FromStepName = "Start", FromOutboxName = nameof(StartStep.SuccessRowsOutbox),
+//				ToStepName = "Success", ToInboxName = nameof(SuccessStep.RowStreamInbox),
+//			});
 
-			transformation1.Hops.Add(new Hop()
-			{
-				FromStepName = "Start", FromOutboxName = nameof(StartStep.RowErrorOutbox),
-				ToStepName = "Error", ToInboxName = nameof(ErrorStep.RowStreamInbox),
-			});
+//			flow1.Hops.Add(new HopImpl()
+//			{
+//				FromStepName = "Start", FromOutboxName = nameof(StartStep.RowErrorOutbox),
+//				ToStepName = "Error", ToInboxName = nameof(ErrorStep.RowStreamInbox),
+//			});
 
-			transformation1.Hops.Add(new Hop()
-			{
-				FromStepName = "Start", FromOutboxName = nameof(StartStep.StepCompleteOutbox),
-				ToStepName = "StepComplete", ToInboxName = nameof(StepCompleteStep.RowStreamInbox),
-			});
+//			flow1.Hops.Add(new HopImpl()
+//			{
+//				FromStepName = "Start", FromOutboxName = nameof(StartStep.StepCompleteOutbox),
+//				ToStepName = "StepComplete", ToInboxName = nameof(StepCompleteStep.RowStreamInbox),
+//			});
 
-			_engine.Repository = repository1;
+//			_engine.App = app1;
 
-			// act
+//			// act
 
-			_engine.Run();
+//			_engine.Run();
 			
-			// assert
-		}
+//			// assert
+//		}
 
-		class StartStep : Step
-		{
-			public SeedRowInbox SeedRowInbox { get; set; }
-			public SuccessRowOutbox SuccessRowOutbox { get; set; }
+//		class StartStep : IStep
+//		{
+//			public AbstractSeedRowInbox SeedRowInbox { get; set; }
+//			public AbstractSuccessRowsOutbox SuccessRowsOutbox { get; set; }
 
-			public override void Initialize()
-			{
-				SeedRowInbox.OnRow += SeedRowInbox_OnRow;
-			}
+//			public void Initialize()
+//			{
+//				SeedRowInbox.RowReceived += SeedRowInbox_RowReceived;
+//			}
 
-			private void SeedRowInbox_OnRow(object sender, OnRowEventArgs e)
-			{
-				SuccessRowOutbox.AddRow(new());
-				SuccessRowOutbox.AddRow(new());
-				SuccessRowOutbox.AddRow(null);
-			}
-		}
+//			private void SeedRowInbox_RowReceived(object sender, IRowReceivedEventArgs e)
+//			{
+//				SuccessRowsOutbox.AddRow(e.Row);
+//			}
+//		}
 
-		class SuccessStep : Step
-		{
-			public RowStreamInbox RowStreamInbox { get; set; }
-			public SuccessRowOutbox RowSuccessOutbox { get; set; }
+//		class SuccessStep : IStep
+//		{
+//			public IRowStreamInbox RowStreamInbox { get; set; }
+//			public AbstractSuccessRowsOutbox SuccessRowsOutbox { get; set; }
 
-			public override void Initialize()
-			{
-				RowStreamInbox.OnRow += RowStreamInbox_OnRow;
-			}
+//			public void Initialize()
+//			{
+//				RowStreamInbox.RowReceived += RowStreamInbox_RowReceived;
+//			}
 
-			private void RowStreamInbox_OnRow(object sender, OnRowEventArgs e)
-			{
-				RowSuccessOutbox.AddRow(e.Row);
-			}
-		}
+//			private void RowStreamInbox_RowReceived(object sender, IRowReceivedEventArgs e)
+//			{
+//				SuccessRowsOutbox.AddRow(e.Row);
+//			}
+//		}
 
-		class ErrorStep : Step
-		{
-			public RowStreamInbox RowStreamInbox { get; set; }
-			public SuccessRowOutbox RowSuccessOutbox { get; set; }
+//		class ErrorStep : IStep
+//		{
+//			public IRowStreamInbox RowStreamInbox { get; set; }
+//			public AbstractSuccessRowsOutbox SuccessRowsOutbox { get; set; }
 
-			public override void Initialize()
-			{
-				RowStreamInbox.OnRow += RowStreamInbox_OnRow;
-			}
+//			public void Initialize()
+//			{
+//				RowStreamInbox.RowReceived += RowStreamInbox_RowReceived;
+//			}
 
-			private void RowStreamInbox_OnRow(object sender, OnRowEventArgs e)
-			{
-				RowSuccessOutbox.AddRow(e.Row);
-			}
-		}
+//			private void RowStreamInbox_RowReceived(object sender, IRowReceivedEventArgs e)
+//			{
+//				SuccessRowsOutbox.AddRow(e.Row);
+//			}
+//		}
 
-		class StepCompleteStep : Step
-		{
-			public RowStreamInbox RowStreamInbox { get; set; }
-			public SuccessRowOutbox RowSuccessOutbox { get; set; }
+//		class StepCompleteStep : IStep
+//		{
+//			public IRowStreamInbox RowStreamInbox { get; set; }
+//			public AbstractSuccessRowsOutbox SuccessRowsOutbox { get; set; }
 
-			public override void Initialize()
-			{
-				RowStreamInbox.OnRow += RowStreamInbox_OnRow;
-			}
+//			public void Initialize()
+//			{
+//				RowStreamInbox.RowReceived += RowStreamInbox_RowReceived;
+//			}
 
-			private void RowStreamInbox_OnRow(object sender, OnRowEventArgs e)
-			{
-				RowSuccessOutbox.AddRow(e.Row);
-			}
-		}
-	}
-}
+//			private void RowStreamInbox_RowReceived(object sender, IRowReceivedEventArgs e)
+//			{
+//				SuccessRowsOutbox.AddRow(e.Row);
+//			}
+//		}
+//	}
+//}

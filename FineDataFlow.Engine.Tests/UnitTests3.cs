@@ -1,64 +1,64 @@
-using FineDataFlow.Engine.Inboxes;
-using FineDataFlow.Engine.Outboxes;
-using NUnit.Framework;
+//using FineDataFlow.Engine.Inboxes;
+//using FineDataFlow.Engine.Outboxes;
+//using NUnit.Framework;
 
-namespace FineDataFlow.Engine.Tests
-{
-	public class UnitTests3
-	{
-		DataFlowEngine _engine;
+//namespace FineDataFlow.Engine.Tests
+//{
+//	public class UnitTests3
+//	{
+//		DataFlowEngine _engine;
 
-		[SetUp]
-		public void SetUp()
-		{
-			_engine = new DataFlowEngine();
-		}
+//		[SetUp]
+//		public void SetUp()
+//		{
+//			_engine = new DataFlowEngine();
+//		}
 
-		[TearDown]
-		public void TearDown()
-		{
-			_engine.Dispose();
-		}
+//		[TearDown]
+//		public void TearDown()
+//		{
+//			_engine.Dispose();
+//		}
 
-		[Test]
-		public void Test1()
-		{
-			// arrange
+//		[Test]
+//		public void Test1()
+//		{
+//			// arrange
 
-			var repository1 = new Repository();
-			repository1.Name = "Repository1";
+//			var app1 = new AppImpl();
+//			app1.Name = "App1";
 			
-			var transformation1 = new Transformation();
-			transformation1.Name = "Transformation1";
-			repository1.Transformations.Add(transformation1);
+//			var flow1 = new FlowImpl();
+//			flow1.Name = "Flow1";
+//			app1.Flows.Add(flow1);
 
-			transformation1.Steps.Add(new StartStep() { Name = "Start" });
+//			flow1.Steps.Add(new StartStep() { Name = "Start" });
 			
-			_engine.Repository = repository1;
+//			_engine.App = app1;
 
-			// act
+//			// act
 
-			_engine.Run();
+//			_engine.Run();
 			
-			// assert
-		}
+//			// assert
+//		}
 
-		class StartStep : Step
-		{
-			public SeedRowInbox SeedRowInbox { get; set; }
-			public SuccessRowOutbox SuccessRowOutbox { get; set; }
+//		class StartStep : StepImpl
+//		{
+//			public SeedRowInboxImpl SeedRowInbox { get; set; }
+//			public SuccessRowsOutboxImpl SuccessRowOutbox { get; set; }
 
-			public override void Initialize()
-			{
-				SeedRowInbox.OnRow += SeedRowInbox_OnRow;
-			}
+//			public override void Initialize()
+//			{
+//				SeedRowInbox.OnRow += SeedRowInbox_OnRow;
+//			}
 
-			private void SeedRowInbox_OnRow(object sender, OnRowEventArgs e)
-			{
-				SuccessRowOutbox.AddRow(new());
-				SuccessRowOutbox.AddRow(new());
-				SuccessRowOutbox.AddRow(null);
-			}
-		}
-	}
-}
+//			private void SeedRowInbox_OnRow(object sender, OnRowEventArgs e)
+//			{
+//				SuccessRowOutbox.AddRow(new());
+//				SuccessRowOutbox.AddRow(new());
+//				SuccessRowOutbox.AddRow(null);
+//			}
+//		}
+//	}
+//}

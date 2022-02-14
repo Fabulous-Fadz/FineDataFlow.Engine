@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.0.3</Version>
+		<LangVersion>latest</LangVersion>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<AssemblyName>FineDataFlow.Engine</AssemblyName>
+		<RootNamespace>FineDataFlow.Engine</RootNamespace>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageProjectUrl>https://github.com/FortuneN/FineDataFlow.Engine</PackageProjectUrl>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\FineDataFlow.Engine.Internal\20.FineDataFlow.Engine.Internal.csproj" />
+	</ItemGroup>
+
+</Project>

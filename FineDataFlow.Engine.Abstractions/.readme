@@ -1,0 +1,10 @@
+﻿- This library contains public abstractions
+- The target audience is plugin developers
+- Nothing should be included in here that plugin developers should not 'see' (Yes, not even internal members)
+- Everything here is public
+- No implementations here, just API
+
+TODO
+----
+- Analyzers to enforce rules
+- More attributes
