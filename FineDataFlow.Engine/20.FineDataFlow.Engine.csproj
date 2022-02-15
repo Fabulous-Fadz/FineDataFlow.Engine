@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.0.10</Version>
+		<Version>0.0.11</Version>
 		<LangVersion>latest</LangVersion>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<AssemblyName>FineDataFlow.Engine</AssemblyName>
@@ -9,6 +9,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageProjectUrl>https://github.com/FortuneN/FineDataFlow.Engine</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/FortuneN/FineDataFlow.Engine/blob/master/LICENSE</PackageLicenseUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
