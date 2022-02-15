@@ -8,22 +8,30 @@ namespace FineDataFlow.Engine.Implementations
 {
 	internal class SuccessOutboxImpl : ISuccessOutbox
 	{
+		private static readonly Type PropertyOrFieldType = typeof(Action<Row>);
+		
 		// properties
 
 		public string Name { get; set; }
 		public IInbox ToInbox { get; set; }
-		public object StepObject { get; set; }
 		public MemberInfo Member { get; set; }
 		public Attribute Attribute { get; set; }
+		public Type StepPluginType { get; set; }
+		public object StepPluginObject { get; set; }
 		public ActionBlock<Row> ActionBlock { get; set; }
 
 		// methods
 
+		private string AttributeName<T>() where T : Attribute
+		{
+			return $"{typeof(T).Name}$".Replace("Attribute$", null, StringComparison.OrdinalIgnoreCase);
+		}
+
 		public void Initialize()
 		{
-			if (StepObject == null)
+			if (StepPluginType == null)
 			{
-				throw new InvalidOperationException($"{nameof(StepObject)} is required");
+				throw new InvalidOperationException($"{nameof(StepPluginType)} is required");
 			}
 
 			if (Member == null)
@@ -46,12 +54,12 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"{nameof(Attribute)} must be of type {nameof(SuccessOutboxAttribute)}");
 			}
 
-			if (!StepObject.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x == Member))
+			if (!StepPluginType.GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x == Member))
 			{
-				throw new InvalidOperationException($"{nameof(Member)} must be a member of {nameof(StepObject)}'s type");
+				throw new InvalidOperationException($"{nameof(Member)} must be a member of {nameof(StepPluginObject)}'s type");
 			}
 
-			if (!Member.GetType().IsDefined(Attribute.GetType()))
+			if (!Member.IsDefined(Attribute.GetType()))
 			{
 				throw new InvalidOperationException($"{nameof(Member)} must have attribute of type {nameof(SuccessOutboxAttribute)} defined");
 			}
@@ -59,16 +67,26 @@ namespace FineDataFlow.Engine.Implementations
 			var action = new Action<Row>(AddRow);
 			var attribute = (SuccessOutboxAttribute)Attribute;
 			
+			Name = string.IsNullOrWhiteSpace(attribute.Name) ? Member.Name : attribute.Name;
+
 			if (Member is PropertyInfo property)
 			{
-				property.SetValue(StepObject, action);
+				if (property.PropertyType != PropertyOrFieldType || !property.CanWrite)
+				{
+					throw new InvalidOperationException($"{AttributeName<StepPluginAttribute>()} property {StepPluginType.FullName}.{property.Name} has an invalid signature for a {AttributeName<SuccessOutboxAttribute>()}");
+				}
+
+				property.SetValue(StepPluginObject, action);
 			}
 			else if (Member is FieldInfo field)
 			{
-				field.SetValue(StepObject, action);
-			}
+				if (field.FieldType != PropertyOrFieldType)
+				{
+					throw new InvalidOperationException($"{AttributeName<StepPluginAttribute>()} field {StepPluginType.FullName}.{field.Name} has an invalid signature for a {AttributeName<SuccessOutboxAttribute>()}");
+				}
 
-			Name = string.IsNullOrWhiteSpace(attribute.Name) ? Member.Name : attribute.Name;
+				field.SetValue(StepPluginObject, action);
+			}
 		}
 
 		public void AddRow(Row row)

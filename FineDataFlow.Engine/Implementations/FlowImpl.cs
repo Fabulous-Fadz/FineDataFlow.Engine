@@ -57,6 +57,12 @@ namespace FineDataFlow.Engine.Implementations
 					fromOutbox.ToInbox = toInbox;
 					toInbox.FromOutbox = fromOutbox;
 				});
+
+			// initialize steps
+
+			Steps
+				.AsParallel()
+				.ForAll(step => step.Initialize());
 		}
 
 		public Task RunAsync()

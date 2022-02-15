@@ -10,21 +10,17 @@ namespace FineDataFlow.Engine.Implementations
 		// properties
 
 		public string Name { get; set; }
-		public object StepObject { get; set; }
 		public IInbox ToInbox { get; set; }
 		public MemberInfo Member { get; set; }
 		public Attribute Attribute { get; set; }
+		public Type StepPluginType { get; set; }
+		public object StepPluginObject { get; set; }
 		public ActionBlock<Row> ActionBlock { get; set; }
 
 		// methods
 
 		public void Initialize()
 		{
-			if (StepObject == null)
-			{
-				throw new InvalidOperationException($"{nameof(StepObject)} is required");
-			}
-
 			Name = IStepCompleteOutbox.OutboxName;
 		}
 

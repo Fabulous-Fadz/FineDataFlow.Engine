@@ -13,13 +13,11 @@ namespace FineDataFlow.Engine.Implementations
 {
 	internal class PluginLoaderImpl : AssemblyLoadContext, IPluginLoader
 	{
-		private static readonly Dictionary<string, Assembly> SharedAssemblies = new();
-
 		// fields
 
-		private List<Assembly> _loadedAssemblies;
-		private AssemblyDependencyResolver _resolver;
-
+		private readonly List<Assembly> _loadedAssemblies = new();
+		private static readonly Dictionary<string, Assembly> _sharedAssemblies = new();
+		
 		// properties
 
 		public string PluginId { get; set; }
@@ -31,103 +29,53 @@ namespace FineDataFlow.Engine.Implementations
 
 		static PluginLoaderImpl()
 		{
+			_sharedAssemblies = new Dictionary<string, Assembly>();
+			
 			foreach (var assembly in new[]
 			{
+				typeof(IStep).Assembly,
 				typeof(StepPluginAttribute).Assembly,
-				typeof(IStep).Assembly
 			})
 			{
-				SharedAssemblies[Path.GetFileName(assembly.Location)] = assembly;
+				_sharedAssemblies[Path.GetFileName(assembly.Location)] = assembly;
 			}
 		}
 
 		public PluginLoaderImpl() : base(true)
 		{
+			_loadedAssemblies = new List<Assembly>();
 		}
 
 		// methods
-
+		
 		protected override Assembly Load(AssemblyName assemblyName)
 		{
-			var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+			var filename = $"{assemblyName.Name}.dll";
 
-			if (string.IsNullOrWhiteSpace(assemblyPath))
+			if (_sharedAssemblies.ContainsKey(filename))
 			{
-				return null;
+				return _sharedAssemblies[filename];
 			}
 
-			var sharedAssembly = SharedAssemblies
-				.Where(x => x.Key.Equals(Path.GetFileName(assemblyPath), StringComparison.OrdinalIgnoreCase))
-				.Select(x => x.Value)
-				.Where(x => x != null)
-				.FirstOrDefault();
-
-			if (sharedAssembly != null)
-			{
-				return sharedAssembly;
-			}
-
-			return LoadFromAssemblyPath(assemblyPath);
-		}
-
-		protected override IntPtr LoadUnmanagedDll(string dllName)
-		{
-			var assemblyPath = _resolver.ResolveUnmanagedDllToPath(dllName);
-
-			if (string.IsNullOrWhiteSpace(assemblyPath))
-			{
-				return IntPtr.Zero;
-			}
-
-			var sharedAssembly = SharedAssemblies
-				.Where(x => x.Key.Equals(Path.GetFileName(assemblyPath), StringComparison.OrdinalIgnoreCase))
-				.Select(x => x.Value)
-				.Where(x => x != null)
-				.FirstOrDefault();
-
-			if (sharedAssembly != null)
-			{
-				return IntPtr.Zero;
-			}
-
-			return LoadUnmanagedDllFromPath(assemblyPath);
+			return Assembly.Load(assemblyName);
 		}
 
 		public void Initialize()
 		{
-			if (string.IsNullOrWhiteSpace(PluginFolder))
+			foreach (var dllFile in Directory.EnumerateFiles(PluginFolder, "*.*").Where(x => x.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
 			{
-				throw new InvalidOperationException($"{nameof(PluginFolder)} is required");
-			}
-
-			if (!Directory.Exists(PluginFolder))
-			{
-				throw new InvalidOperationException($"Folder '{PluginFolder}' not found");
-			}
-
-			_resolver = new AssemblyDependencyResolver(PluginFolder);
-			_loadedAssemblies = new List<Assembly>();
-
-			Directory
-				.EnumerateFiles(PluginFolder, "*.*", SearchOption.AllDirectories)
-				.Where(x => x.EndsWith("dll", StringComparison.OrdinalIgnoreCase))
-				.ToList()
-				.ForEach(dllFile =>
+				if (_sharedAssemblies.ContainsKey(Path.GetFileName(dllFile)))
 				{
-					try
-					{
-						_loadedAssemblies.Add(LoadFromAssemblyPath(dllFile));
-					}
-					catch
-					{
-						// ignore
-					}
-				});
+					continue;
+				}
+
+				_loadedAssemblies.Add(LoadFromAssemblyPath(dllFile));
+			}
 
 			PluginType = _loadedAssemblies
 				.SelectMany(a => a.GetTypes())
-				.Where(t => t.FullName == Path.GetFileNameWithoutExtension(PluginFolder))
-				.Where(t => !t.IsAbstract)
+				.Where(t => t.IsClass)
+				.Where(t => !t.IsAbstract || (t.IsAbstract && t.IsSealed))
 				.Where(t => t.IsDefined(PluginAttributeType))
 				.FirstOrDefault();
 		}
@@ -136,13 +84,12 @@ namespace FineDataFlow.Engine.Implementations
 		{
 			GC.SuppressFinalize(this);
 
-			_resolver = null;
 			PluginType = null;
-			SharedAssemblies?.Clear();
-			_loadedAssemblies?.Clear();
 			PluginAttributeType = null;
+			_loadedAssemblies?.Clear();
 
-			Unload();
+			//TODO:This MUST work!!!!!!!!!!!!!!!
+			//Unload();
 		}
 	}
 }

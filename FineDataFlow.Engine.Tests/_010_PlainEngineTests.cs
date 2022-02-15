@@ -3,6 +3,7 @@ using FineDataFlow.Engine.Tests.TestUtilities;
 using NUnit.Framework;
 using Shouldly;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FineDataFlow.Engine.Tests
@@ -15,6 +16,13 @@ namespace FineDataFlow.Engine.Tests
 		public void SetUp()
 		{
 			_engine = new DataFlowEngine();
+
+			if (Directory.Exists(_engine.PluginsFolder))
+			{
+				Directory.Delete(_engine.PluginsFolder, true);
+			}
+
+			Directory.CreateDirectory(_engine.PluginsFolder);
 		}
 
 		[TearDown]
@@ -103,11 +111,95 @@ namespace FineDataFlow.Engine.Tests
 
 			appSource.App.Flows.Add(new Flow
 			{
-				Name = "Flow1",
-				Enabled = true
+				Name = "Flow1"
 			});
 
 			_engine.AppSource = appSource;
+
+			await _engine.RunAsync();
+		}
+
+		[Test]
+		public async Task _070_NewEngine_AppSource_PluginSource_Run_One_SeedInbox_Step()
+		{
+			var pluginSource = new TestPluginSource();
+			var appSource = new TestAppSource();
+
+			appSource.App.Flows.Add(new Flow
+			{
+				Name = "Flow1",
+				Steps =
+				{
+					new Step { Name = "Step1", PluginId = "SeedInbox_SuccessOutbox_StepPlugin@2.0.3" }
+				}
+			});
+
+			_engine.AppSource = appSource;
+			_engine.PluginSources.Add(pluginSource);
+
+			await _engine.RunAsync();
+		}
+
+		[Test]
+		public async Task _081_NewEngine_AppSource_PluginSource_Run_One_StreamInbox_Step()
+		{
+			var pluginSource = new TestPluginSource();
+			var appSource = new TestAppSource();
+
+			appSource.App.Flows.Add(new Flow
+			{
+				Name = "Flow1",
+				Steps =
+				{
+					new Step { Name = "Step1", PluginId = "StreamInbox_SuccessOutbox_StepPlugin@2.0.3" }
+				}
+			});
+
+			_engine.AppSource = appSource;
+			_engine.PluginSources.Add(pluginSource);
+
+			await _engine.RunAsync();
+		}
+
+		[Test]
+		public async Task _082_NewEngine_AppSource_PluginSource_Run_One_AllRowsInbox_Step()
+		{
+			var pluginSource = new TestPluginSource();
+			var appSource = new TestAppSource();
+
+			appSource.App.Flows.Add(new Flow
+			{
+				Name = "Flow1",
+				Steps =
+				{
+					new Step { Name = "Step1", PluginId = "StreamInbox_SuccessOutbox_StepPlugin@2.0.3" }
+				}
+			});
+
+			_engine.AppSource = appSource;
+			_engine.PluginSources.Add(pluginSource);
+
+			await _engine.RunAsync();
+		}
+
+		[Test]
+		public async Task _090_NewEngine_AppSource_PluginSource_Run_OneStep()
+		{
+			var pluginSource = new TestPluginSource();
+			var appSource = new TestAppSource();
+
+			appSource.App.Flows.Add(new Flow
+			{
+				Name = "Flow1",
+				Steps =
+				{
+					new Step { Name = "Step1", PluginId = "SeedInbox_SuccessOutbox_StepPlugin@2.0.3" },
+					new Step { Name = "Step2", PluginId = "StreamInbox_SuccessOutbox_StepPlugin@1.2.9" }
+				}
+			});
+
+			_engine.AppSource = appSource;
+			_engine.PluginSources.Add(pluginSource);
 
 			await _engine.RunAsync();
 		}

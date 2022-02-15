@@ -4,6 +4,7 @@ using FineDataFlow.Engine.Implementations;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -123,6 +124,13 @@ namespace FineDataFlow.Engine
 			if (string.IsNullOrWhiteSpace(PluginsFolder))
 			{
 				throw new InvalidOperationException($"{nameof(PluginsFolder)} is required");
+			}
+
+			PluginsFolder = Path.GetFullPath(PluginsFolder);
+
+			if (!Directory.Exists(PluginsFolder))
+			{
+				throw new InvalidOperationException($"{nameof(PluginsFolder)} '{nameof(PluginsFolder)}' not found");
 			}
 
 			// create and initialize app

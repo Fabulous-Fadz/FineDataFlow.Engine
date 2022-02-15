@@ -2,33 +2,42 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
 namespace FineDataFlow.Engine.Implementations
 {
 	internal class RowStreamInboxImpl : IRowStreamInbox
 	{
+		private static readonly Type VoidType = typeof(void);
+		private static readonly Type TaskType = typeof(Task);
+
 		// fields
 
-		private string _name;
-		private Action<Row> _action;
+		private Func<Row, Task> _processRowAsync;
 
 		// properties
 
-		public string Name => _name;
-		public object StepObject { get; set; }
+		public string Name { get; set; }
 		public MemberInfo Member { get; set; }
 		public IOutbox FromOutbox { get; set; }
 		public Attribute Attribute { get; set; }
+		public Type StepPluginType { get; set; }
+		public object StepPluginObject { get; set; }
 		public ActionBlock<Row> ActionBlock { get; set; }
 
 		// methods
 
+		private string AttributeName<T>() where T : Attribute
+		{
+			return $"{typeof(T).Name}$".Replace("Attribute$", null, StringComparison.OrdinalIgnoreCase);
+		}
+
 		public void Initialize()
 		{
-			if (StepObject == null)
+			if (StepPluginType == null)
 			{
-				throw new InvalidOperationException($"{nameof(StepObject)} is required");
+				throw new InvalidOperationException($"{nameof(StepPluginType)} is required");
 			}
 
 			if (Member == null)
@@ -51,12 +60,12 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"{nameof(Attribute)} must be of type {nameof(RowStreamInboxAttribute)}");
 			}
 
-			if (!StepObject.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x == Member))
+			if (!StepPluginType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x == Member))
 			{
-				throw new InvalidOperationException($"{nameof(Member)} must be a member of {nameof(StepObject)}'s type");
+				throw new InvalidOperationException($"{nameof(Member)} must be a member of {nameof(StepPluginObject)}'s type");
 			}
 
-			if (!Member.GetType().IsDefined(Attribute.GetType()))
+			if (!Member.IsDefined(Attribute.GetType()))
 			{
 				throw new InvalidOperationException($"{nameof(Member)} must have attribute of type {nameof(RowStreamInboxAttribute)} defined");
 			}
@@ -64,13 +73,31 @@ namespace FineDataFlow.Engine.Implementations
 			var method = (MethodInfo)Member;
 			var attribute = (RowStreamInboxAttribute)Attribute;
 
-			_name = string.IsNullOrWhiteSpace(attribute.Name) ? Member.Name : attribute.Name;
-			_action = (Action<Row>)method.CreateDelegate(typeof(Action<Row>), StepObject);
+			Name = string.IsNullOrWhiteSpace(attribute.Name) ? Member.Name : attribute.Name;
+
+			if (method.ReturnType == VoidType)
+			{
+				var processRowAsync = (Action<Row>)method.CreateDelegate(typeof(Action<Row>), StepPluginObject);
+
+				_processRowAsync = async (row) =>
+				{
+					processRowAsync(row);
+					await Task.CompletedTask;
+				};
+			}
+			else if (method.ReturnType == TaskType)
+			{
+				_processRowAsync = (Func<Row, Task>)method.CreateDelegate(typeof(Func<Row, Task>), StepPluginObject);
+			}
+			else
+			{
+				throw new InvalidOperationException($"{AttributeName<StepPluginAttribute>()} method {StepPluginType.FullName}.{method.Name} has an invalid signature for a {AttributeName<RowStreamInboxAttribute>()}");
+			}
 		}
 
-		public void ProcessRow(Row row)
+		public async Task ProcessRowAsync(Row row)
 		{
-			_action(row);
+			await _processRowAsync(row);
 		}
 	}
 }

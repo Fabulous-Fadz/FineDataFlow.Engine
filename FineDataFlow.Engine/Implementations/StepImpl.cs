@@ -57,32 +57,34 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"{nameof(PluginType)} must have {nameof(StepPluginAttribute)} defined");
 			}
 
-			PluginObject = _serviceProvider.GetRequiredService(PluginType);
-
-			Name = string.IsNullOrWhiteSpace(stepAttribute.Name) ? PluginType.FullName : stepAttribute.Name;
+			if (!(PluginObject == null && PluginType.IsAbstract && PluginType.IsSealed)) // static check
+			{
+				PluginObject = Activator.CreateInstance(PluginType);
+			}
 
 			// create inboxes
 
-			foreach (var abstractionTypes in new[]
+			foreach (var attributeInterfacePair in new[]
 			{
 				new { AttributeType = typeof(SeedInboxAttribute), InterfaceType = typeof(ISeedInbox) },
 				new { AttributeType = typeof(AllRowsInboxAttribute), InterfaceType = typeof(IAllRowsInbox) },
 				new { AttributeType = typeof(RowStreamInboxAttribute), InterfaceType = typeof(IRowStreamInbox) },
 			})
 			{
-				foreach (var member in PluginType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Cast<MemberInfo>())
+				foreach (var member in PluginType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MemberInfo>())
 				{
-					var attribute = member.GetCustomAttribute(abstractionTypes.AttributeType, true);
+					var attribute = member.GetCustomAttribute(attributeInterfacePair.AttributeType, true);
 					
 					if (attribute == null)
 					{
 						continue;
 					}
 
-					var inbox = (IInbox)_serviceProvider.GetRequiredService(abstractionTypes.InterfaceType);
+					var inbox = (IInbox)_serviceProvider.GetRequiredService(attributeInterfacePair.InterfaceType);
 					inbox.Member = member;
 					inbox.Attribute = attribute;
-					inbox.StepObject = PluginObject;
+					inbox.StepPluginType = PluginType;
+					inbox.StepPluginObject = PluginObject;
 					inbox.Initialize();
 					Inboxes.Add(inbox);
 				}
@@ -90,36 +92,39 @@ namespace FineDataFlow.Engine.Implementations
 
 			// create outboxes
 
-			foreach (var abstractionTypes in new[]
+			foreach (var attributeInterfacePair in new[]
 			{
 				new { AttributeType = typeof(SuccessOutboxAttribute), InterfaceType = typeof(ISuccessOutbox) },
 			})
 			{
-				foreach (var member in PluginType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(x => x.CanWrite).Cast<MemberInfo>().Concat(PluginType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)))
+				foreach (var member in PluginType.GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Cast<MemberInfo>().Concat(PluginType.GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)))
 				{
-					var attribute = member.GetCustomAttribute(abstractionTypes.AttributeType, true);
+					var attribute = member.GetCustomAttribute(attributeInterfacePair.AttributeType, true);
 					
 					if (attribute == null)
 					{
 						continue;
 					}
 
-					var outbox = (IOutbox)_serviceProvider.GetRequiredService(abstractionTypes.InterfaceType);
+					var outbox = (IOutbox)_serviceProvider.GetRequiredService(attributeInterfacePair.InterfaceType);
 					outbox.Member = member;
 					outbox.Attribute = attribute;
-					outbox.StepObject = PluginObject;
+					outbox.StepPluginType = PluginType;
+					outbox.StepPluginObject = PluginObject;
 					outbox.Initialize();
 					Outboxes.Add(outbox);
 				}
 			}
 
 			_rowErrorOutbox = _serviceProvider.GetRequiredService<IRowErrorOutbox>();
-			_rowErrorOutbox.StepObject = PluginObject;
+			_rowErrorOutbox.StepPluginType = PluginType;
+			_rowErrorOutbox.StepPluginObject = PluginObject;
 			_rowErrorOutbox.Initialize();
 			Outboxes.Add(_rowErrorOutbox);
 
 			_stepCompleteOutbox = _serviceProvider.GetRequiredService<IStepCompleteOutbox>();
-			_stepCompleteOutbox.StepObject = PluginObject;
+			_stepCompleteOutbox.StepPluginType = PluginType;
+			_stepCompleteOutbox.StepPluginObject = PluginObject;
 			_stepCompleteOutbox.Initialize();
 			Outboxes.Add(_stepCompleteOutbox);
 		}
@@ -143,7 +148,7 @@ namespace FineDataFlow.Engine.Implementations
 								await allRowsInboxesCompletionTask;
 							}
 
-							inbox.ProcessRow(row);
+							await inbox.ProcessRowAsync(row);
 							
 							if (row == null)
 							{
@@ -195,9 +200,9 @@ namespace FineDataFlow.Engine.Implementations
 			// initialize step
 
 			PluginType
-				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
 				.AsParallel()
-				.ForAll(method =>
+				.ForAll(async method =>
 				{
 					var attribute = method.GetCustomAttribute<InitializeAttribute>();
 
@@ -224,7 +229,7 @@ namespace FineDataFlow.Engine.Implementations
 						resultTasks.Add(resultTask);
 					}
 
-					Task.WaitAll(resultTasks.ToArray());
+					await Task.WhenAll(resultTasks);
 				});
 
 			// collect runnable tasks
@@ -267,9 +272,9 @@ namespace FineDataFlow.Engine.Implementations
 			GC.SuppressFinalize(this);
 
 			PluginType
-				.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
 				.AsParallel()
-				.ForAll(method =>
+				.ForAll(async method =>
 				{
 					var attribute = method.GetCustomAttribute<DestroyAttribute>();
 
@@ -296,7 +301,7 @@ namespace FineDataFlow.Engine.Implementations
 						resultTasks.Add(resultTask);
 					}
 
-					Task.WaitAll(resultTasks.ToArray());
+					await Task.WhenAll(resultTasks);
 				});
 		}
 	}
