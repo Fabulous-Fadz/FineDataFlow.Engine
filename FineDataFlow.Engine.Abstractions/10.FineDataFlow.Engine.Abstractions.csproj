@@ -9,6 +9,7 @@
 		<AssemblyName>FineDataFlow.Engine.Abstractions</AssemblyName>
 		<RootNamespace>FineDataFlow.Engine.Abstractions</RootNamespace>
 		<PackageProjectUrl>https://github.com/FortuneN/FineDataFlow.Engine</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/FortuneN/FineDataFlow.Engine/blob/master/LICENSE</PackageLicenseUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
