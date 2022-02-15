@@ -60,37 +60,22 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"{nameof(PluginsFolder)} is required");
 			}
 
+			PluginsFolder = Path.GetFullPath(PluginsFolder);
+
+			if (!Directory.Exists(PluginsFolder))
+			{
+				throw new InvalidOperationException($"{nameof(PluginsFolder)} '{nameof(PluginsFolder)}' not found");
+			}
+
 			// get app
 
 			var app = await AppSource.GetAppAsync();
-
-			Name = app.Name;
-			Version = app.Version;
-			Description = app.Description;
-
-			if (app?.Parameters != null)
-			{
-				Parameters = app
-					.Parameters
-					.AsParallel()
-					.Select(UnpackParameter)
-					.ToList();
-			}
-
-			if (app?.Flows != null)
-			{
-				Flows = app
-					.Flows
-					.AsParallel()
-					.Select(UnpackFlow)
-					.ToList();
-			}
 
 			// get plugins
 
 			var pluginIdsWithoutValidSources = new List<string>();
 
-			var pluginIdAndSourcePairs = Flows
+			var pluginIdAndSourcePairs = app.Flows
 				.AsParallel()
 				.SelectMany(x => x.Steps)
 				.Select(x => x.PluginId)
@@ -103,7 +88,7 @@ namespace FineDataFlow.Engine.Implementations
 						.Where(x => x.HasPluginAsync(pluginId).GetAwaiter().GetResult())
 						.FirstOrDefault();
 
-					// skip if soure not found
+					// skip if source not found
 
 					if (pluginSource == null)
 					{
@@ -192,16 +177,29 @@ namespace FineDataFlow.Engine.Implementations
 				})
 				.ToList();
 
-			_pluginLoaders
-				.AsParallel()
-				.ForAll(loader =>
-				{
-					Flows
-						.AsParallel()
-						.SelectMany(flow => flow.Steps)
-						.Where(step => step.PluginId == loader.PluginId)
-						.ForAll(step => step.PluginType = loader.PluginType);
-				});
+			// unpack app
+
+			Name = app.Name;
+			Version = app.Version;
+			Description = app.Description;
+
+			if (app?.Parameters != null)
+			{
+				Parameters = app
+					.Parameters
+					.AsParallel()
+					.Select(UnpackParameter)
+					.ToList();
+			}
+
+			if (app?.Flows != null)
+			{
+				Flows = app
+					.Flows
+					.AsParallel()
+					.Select(UnpackFlow)
+					.ToList();
+			}
 
 			// initialize parameters
 
@@ -259,8 +257,16 @@ namespace FineDataFlow.Engine.Implementations
 
 			istep.Enabled = s.Enabled;
 			istep.PluginId = s.PluginId;
-			//istep.LogicType = s.FullyQualifiedClassName;//TODO:Resolve
-			
+
+			istep.PluginType = _pluginLoaders
+				.Single(x => x.PluginId.Equals(s.PluginId, StringComparison.OrdinalIgnoreCase))
+				.PluginType;
+
+			if (!(istep.PluginType.IsAbstract && istep.PluginType.IsSealed)) // static check
+			{
+				istep.PluginObject = Activator.CreateInstance(istep.PluginType);
+			}
+
 			return istep;
 		}
 		

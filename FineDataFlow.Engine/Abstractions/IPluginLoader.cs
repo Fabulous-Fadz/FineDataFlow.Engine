@@ -4,11 +4,15 @@ namespace FineDataFlow.Engine.Abstractions
 {
 	internal interface IPluginLoader : IDisposable
 	{
-		string PluginFolder { get; set; }
-		string PluginId { get; set; }
-		Type PluginAttributeType { get; set; }
-		Type PluginType { get; set; }
+		// properties
 
-		void Initialize();
+		public string PluginFolder { get; set; }
+		public string PluginId { get; set; }
+		public Type PluginAttributeType { get; set; }
+		public Type PluginType { get; set; }
+
+		// methods
+
+		public void Initialize();
 	}
 }

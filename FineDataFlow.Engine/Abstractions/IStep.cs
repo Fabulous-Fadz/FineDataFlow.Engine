@@ -10,10 +10,11 @@ namespace FineDataFlow.Engine.Abstractions
 
 		public string Name { get; }
 		public bool Enabled { get; set; }
-		public Type PluginType { get; set; }
 		public string PluginId { get; set; }
+		public Type PluginType { get; set; }
 		public List<IInbox> Inboxes { get; }
 		public List<IOutbox> Outboxes { get; }
+		public object PluginObject { get; set; }
 		
 		// methods
 
