@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace FineDataFlow.Engine.Abstractions
 {
-	internal interface IStep
+	internal interface IStep : IDisposable
 	{
 		// properties
 

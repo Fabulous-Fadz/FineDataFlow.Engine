@@ -74,5 +74,10 @@ namespace FineDataFlow.Engine.Implementations
 					.Select(s => s.RunAsync())
 			);
 		}
+
+		public void Dispose()
+		{
+			// ...
+		}
 	}
 }

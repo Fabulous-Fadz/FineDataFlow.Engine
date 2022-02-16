@@ -10,12 +10,17 @@ namespace FineDataFlow.Engine.Tests
 {
 	public class _010_PlainEngineTests
 	{
+		const string TestPlugins = "./TestPlugins";
+
 		DataFlowEngine _engine;
+		int _pluginsFolderIndex = 0;
+
 
 		[SetUp]
 		public void SetUp()
 		{
 			_engine = new DataFlowEngine();
+			_engine.PluginsFolder = $"{TestPlugins}{_pluginsFolderIndex++}";
 
 			if (Directory.Exists(_engine.PluginsFolder))
 			{
@@ -97,7 +102,7 @@ namespace FineDataFlow.Engine.Tests
 		}
 
 		[Test]
-		public async Task _050_NewEngine_AppSource_Run()
+		public async Task _050_NewEngine_AppSource_Run_No_Flow()
 		{
 			var appSource = new TestAppSource();
 			_engine.AppSource = appSource;
@@ -141,7 +146,7 @@ namespace FineDataFlow.Engine.Tests
 		}
 
 		[Test]
-		public async Task _081_NewEngine_AppSource_PluginSource_Run_One_StreamInbox_Step()
+		public async Task _071_NewEngine_AppSource_PluginSource_Run_One_StreamInbox_Step()
 		{
 			var pluginSource = new TestPluginSource();
 			var appSource = new TestAppSource();
@@ -162,7 +167,7 @@ namespace FineDataFlow.Engine.Tests
 		}
 
 		[Test]
-		public async Task _082_NewEngine_AppSource_PluginSource_Run_One_AllRowsInbox_Step()
+		public async Task _072_NewEngine_AppSource_PluginSource_Run_One_AllRowsInbox_Step()
 		{
 			var pluginSource = new TestPluginSource();
 			var appSource = new TestAppSource();
@@ -172,7 +177,7 @@ namespace FineDataFlow.Engine.Tests
 				Name = "Flow1",
 				Steps =
 				{
-					new Step { Name = "Step1", PluginId = "StreamInbox_SuccessOutbox_StepPlugin@2.0.3" }
+					new Step { Name = "Step1", PluginId = "AllRowsInbox_SuccessOutbox_StepPlugin@2.0.3" }
 				}
 			});
 
@@ -183,7 +188,7 @@ namespace FineDataFlow.Engine.Tests
 		}
 
 		[Test]
-		public async Task _090_NewEngine_AppSource_PluginSource_Run_OneStep()
+		public async Task _080_NewEngine_AppSource_PluginSource_Run_OneStep()
 		{
 			var pluginSource = new TestPluginSource();
 			var appSource = new TestAppSource();

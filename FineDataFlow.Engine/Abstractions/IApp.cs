@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FineDataFlow.Engine.Abstractions
 {
-	internal interface IApp
+	internal interface IApp : IDisposable
 	{
 		// properties
 
@@ -15,6 +16,7 @@ namespace FineDataFlow.Engine.Abstractions
 		public string PluginsFolder { get; set; }
 		public List<IParameter> Parameters { get; set; }
 		public List<IPluginSource> PluginSources { get; set; }
+		public List<IPluginLoader> PluginLoaders { get; set; }
 
 		// methods
 

@@ -23,7 +23,7 @@ namespace FineDataFlow.Engine
 		private bool _disposing;
 		private bool _initialized;
 		private bool _initializing;
-		private readonly ServiceProvider _serviceProvider;
+		private ServiceProvider _serviceProvider;
 
 		// properties
 
@@ -247,10 +247,25 @@ namespace FineDataFlow.Engine
 			// dispose
 
 			_disposing = true;
-			
 			GC.SuppressFinalize(this);
-			_serviceProvider.Dispose();
 
+			try
+			{
+				StopAsync().GetAwaiter().GetResult();
+			}
+			catch
+			{
+				// ignore
+			}
+			finally
+			{
+				_serviceProvider?.Dispose();
+				
+				_app = null;
+				_run = null;
+				_serviceProvider = null;
+			}
+			
 			_disposing = false;
 			_disposed = true;
 		}

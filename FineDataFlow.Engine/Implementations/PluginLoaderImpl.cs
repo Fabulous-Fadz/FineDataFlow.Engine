@@ -41,7 +41,7 @@ namespace FineDataFlow.Engine.Implementations
 			}
 		}
 
-		public PluginLoaderImpl() : base(true)
+		public PluginLoaderImpl() : base(isCollectible: true)
 		{
 			_loadedAssemblies = new List<Assembly>();
 		}
@@ -58,6 +58,17 @@ namespace FineDataFlow.Engine.Implementations
 			}
 
 			return Assembly.Load(assemblyName);
+		}
+
+		public new void Unload()
+		{
+			_loadedAssemblies.Clear();
+			_sharedAssemblies.Clear();
+
+			PluginType = null;
+			PluginAttributeType = null;
+
+			base.Unload();
 		}
 
 		public void Initialize()
@@ -82,14 +93,7 @@ namespace FineDataFlow.Engine.Implementations
 
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
-
-			PluginType = null;
-			PluginAttributeType = null;
-			_loadedAssemblies?.Clear();
-
-			//TODO:This MUST work!!!!!!!!!!!!!!!
-			//Unload();
+			// ...
 		}
 	}
 }

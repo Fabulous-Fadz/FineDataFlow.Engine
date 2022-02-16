@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FineDataFlow.Engine.Abstractions
 {
-	internal interface IFlow
+	internal interface IFlow : IDisposable
 	{
 		// properties
 
@@ -12,7 +13,6 @@ namespace FineDataFlow.Engine.Abstractions
 		public List<IHop> Hops { get; set; }
 		public List<IStep> Steps { get; set; }
 		
-
 		// methods
 
 		public void Initialize();

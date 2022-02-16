@@ -14,5 +14,6 @@ namespace FineDataFlow.Engine.Abstractions
 		// methods
 
 		public void Initialize();
+		public void Unload();
 	}
 }

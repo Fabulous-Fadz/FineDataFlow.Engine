@@ -18,13 +18,14 @@ namespace FineDataFlow.Engine.Implementations
 
 		// properties
 
+		public IStep Step { get; set; }
 		public string Name { get; set; }
-		public MemberInfo Member { get; set; }
 		public IOutbox FromOutbox { get; set; }
 		public Attribute Attribute { get; set; }
 		public Type StepPluginType { get; set; }
 		public object StepPluginObject { get; set; }
 		public ActionBlock<Row> ActionBlock { get; set; }
+		public MemberInfo StepPluginObjectMember { get; set; }
 
 		// methods
 
@@ -40,14 +41,14 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"{nameof(StepPluginType)} is required");
 			}
 
-			if (Member == null)
+			if (StepPluginObjectMember == null)
 			{
-				throw new InvalidOperationException($"{nameof(Member)} is required");
+				throw new InvalidOperationException($"{nameof(StepPluginObjectMember)} is required");
 			}
 
-			if (Member is not MethodInfo)
+			if (StepPluginObjectMember is not MethodInfo)
 			{
-				throw new InvalidOperationException($"{nameof(Member)} must be a method");
+				throw new InvalidOperationException($"{nameof(StepPluginObjectMember)} must be a method");
 			}
 
 			if (Attribute == null)
@@ -60,20 +61,20 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"{nameof(Attribute)} must be of type {nameof(RowStreamInboxAttribute)}");
 			}
 
-			if (!StepPluginType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x == Member))
+			if (!StepPluginType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Any(x => x == StepPluginObjectMember))
 			{
-				throw new InvalidOperationException($"{nameof(Member)} must be a member of {nameof(StepPluginObject)}'s type");
+				throw new InvalidOperationException($"{nameof(StepPluginObjectMember)} must be a member of {nameof(StepPluginObject)}'s type");
 			}
 
-			if (!Member.IsDefined(Attribute.GetType()))
+			if (!StepPluginObjectMember.IsDefined(Attribute.GetType()))
 			{
-				throw new InvalidOperationException($"{nameof(Member)} must have attribute of type {nameof(RowStreamInboxAttribute)} defined");
+				throw new InvalidOperationException($"{nameof(StepPluginObjectMember)} must have attribute of type {nameof(RowStreamInboxAttribute)} defined");
 			}
 
-			var method = (MethodInfo)Member;
+			var method = (MethodInfo)StepPluginObjectMember;
 			var attribute = (RowStreamInboxAttribute)Attribute;
 
-			Name = string.IsNullOrWhiteSpace(attribute.Name) ? Member.Name : attribute.Name;
+			Name = string.IsNullOrWhiteSpace(attribute.Name) ? StepPluginObjectMember.Name : attribute.Name;
 
 			if (method.ReturnType == VoidType)
 			{
@@ -98,6 +99,16 @@ namespace FineDataFlow.Engine.Implementations
 		public async Task ProcessRowAsync(Row row)
 		{
 			await _processRowAsync(row);
+		}
+
+		public async Task DoneAsync()
+		{
+			await Task.CompletedTask;
+		}
+
+		public void Dispose()
+		{
+			// ...
 		}
 	}
 }

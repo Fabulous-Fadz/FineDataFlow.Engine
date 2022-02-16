@@ -9,13 +9,12 @@ using System.Threading.Tasks;
 
 namespace FineDataFlow.Engine.Implementations
 {
-	internal class AppImpl : IApp, IDisposable
+	internal class AppImpl : IApp
 	{
 		private static readonly Type StepPluginAttributeType = typeof(StepPluginAttribute);
 
 		// fields
 
-		private List<IPluginLoader> _pluginLoaders = new();
 		private readonly IServiceProvider _serviceProvider;
 
 		// properties
@@ -28,6 +27,7 @@ namespace FineDataFlow.Engine.Implementations
 		public List<IFlow> Flows { get; set; } = new();
 		public List<IParameter> Parameters { get; set; } = new();
 		public List<IPluginSource> PluginSources { get; set; } = new();
+		public List<IPluginLoader> PluginLoaders { get; set; } = new();
 		
 		// constructors
 
@@ -164,7 +164,7 @@ namespace FineDataFlow.Engine.Implementations
 				throw new InvalidOperationException($"The following plugins were not fetched successfully : {string.Join(", ", pluginsWithEmptyFolders)}");
 			}
 
-			_pluginLoaders = pluginIdAndFolderPairs
+			PluginLoaders = pluginIdAndFolderPairs
 				.AsParallel()
 				.Select(pair =>
 				{
@@ -258,7 +258,7 @@ namespace FineDataFlow.Engine.Implementations
 			istep.Enabled = s.Enabled;
 			istep.PluginId = s.PluginId;
 
-			istep.PluginType = _pluginLoaders
+			istep.PluginType = PluginLoaders
 				.Single(x => x.PluginId.Equals(s.PluginId, StringComparison.OrdinalIgnoreCase))
 				.PluginType;
 
@@ -295,11 +295,7 @@ namespace FineDataFlow.Engine.Implementations
 
 		public void Dispose()
 		{
-			_pluginLoaders
-				.AsParallel()
-				.ForAll(pluginLoader => pluginLoader.Dispose());
-
-			_pluginLoaders.Clear();
+			// ...
 		}
 	}
 }

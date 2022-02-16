@@ -1,6 +1,8 @@
-﻿namespace FineDataFlow.Engine.Abstractions
+﻿using System;
+
+namespace FineDataFlow.Engine.Abstractions
 {
-	internal interface IHop 
+	internal interface IHop : IDisposable
 	{
 		public string FromStepName { get; set; }
 		public string FromOutboxName { get; set; }

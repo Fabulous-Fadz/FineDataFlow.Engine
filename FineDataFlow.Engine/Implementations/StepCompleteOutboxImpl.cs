@@ -9,13 +9,14 @@ namespace FineDataFlow.Engine.Implementations
 	{
 		// properties
 
+		public IStep Step { get; set; }
 		public string Name { get; set; }
 		public IInbox ToInbox { get; set; }
-		public MemberInfo Member { get; set; }
 		public Attribute Attribute { get; set; }
 		public Type StepPluginType { get; set; }
 		public object StepPluginObject { get; set; }
 		public ActionBlock<Row> ActionBlock { get; set; }
+		public MemberInfo StepPluginObjectMember { get; set; }
 
 		// methods
 
@@ -27,6 +28,11 @@ namespace FineDataFlow.Engine.Implementations
 		public void AddRow(Row row)
 		{
 			ActionBlock?.Post(row);
+		}
+
+		public void Dispose()
+		{
+			// ...
 		}
 	}
 }

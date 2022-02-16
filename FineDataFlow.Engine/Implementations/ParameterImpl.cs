@@ -35,5 +35,10 @@ namespace FineDataFlow.Engine.Implementations
 
 			Value = RawValue;
 		}
+
+		public void Dispose()
+		{
+			// ...
+		}
 	}
 }

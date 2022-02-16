@@ -1,8 +1,9 @@
 ﻿using FineDataFlow.Engine.Abstractions.Models;
+using System;
 
 namespace FineDataFlow.Engine.Abstractions
 {
-	internal interface IParameter
+	internal interface IParameter : IDisposable
 	{
 		// properties
 

@@ -10,7 +10,7 @@ using FineDataFlow.Engine.Abstractions;
 
 namespace FineDataFlow.Engine.Implementations
 {
-	internal class StepImpl : IStep, IDisposable
+	internal class StepImpl : IStep
 	{
 		// fields
 
@@ -81,10 +81,11 @@ namespace FineDataFlow.Engine.Implementations
 					}
 
 					var inbox = (IInbox)_serviceProvider.GetRequiredService(attributeInterfacePair.InterfaceType);
-					inbox.Member = member;
+					inbox.Step = this;
 					inbox.Attribute = attribute;
 					inbox.StepPluginType = PluginType;
 					inbox.StepPluginObject = PluginObject;
+					inbox.StepPluginObjectMember = member;
 					inbox.Initialize();
 					Inboxes.Add(inbox);
 				}
@@ -107,16 +108,18 @@ namespace FineDataFlow.Engine.Implementations
 					}
 
 					var outbox = (IOutbox)_serviceProvider.GetRequiredService(attributeInterfacePair.InterfaceType);
-					outbox.Member = member;
+					outbox.Step = this;
 					outbox.Attribute = attribute;
 					outbox.StepPluginType = PluginType;
 					outbox.StepPluginObject = PluginObject;
+					outbox.StepPluginObjectMember = member;
 					outbox.Initialize();
 					Outboxes.Add(outbox);
 				}
 			}
 
 			_rowErrorOutbox = _serviceProvider.GetRequiredService<IRowErrorOutbox>();
+			_rowErrorOutbox.Step = this;
 			_rowErrorOutbox.StepPluginType = PluginType;
 			_rowErrorOutbox.StepPluginObject = PluginObject;
 			_rowErrorOutbox.Initialize();
@@ -134,7 +137,28 @@ namespace FineDataFlow.Engine.Implementations
 			// setup inboxes and outboxes
 
 			var allRowsInboxesCompletionTask = default(Task);
-			
+
+			void evaluateInboxCompletion(IInbox inbox)
+			{
+				Task.Factory.StartNew(() =>
+				{
+					lock (this)
+					{
+						if (inbox.ActionBlock.InputCount == 0 && (inbox.FromOutbox == null || inbox.FromOutbox.Step.Inboxes.Count == 0 || inbox.FromOutbox.Step.Inboxes.All(x => x.ActionBlock.Completion.IsCompleted)))
+						{
+							Inboxes
+								.AsParallel()
+								.Where(x => !x.ActionBlock.Completion.IsCompleted)
+								.ForAll(x =>
+								{
+									x.DoneAsync();
+									x.ActionBlock.Complete();
+								});
+						}
+					}
+				});
+			}
+
 			Inboxes
 				.AsParallel()
 				.ForAll(inbox =>
@@ -149,39 +173,39 @@ namespace FineDataFlow.Engine.Implementations
 							}
 
 							await inbox.ProcessRowAsync(row);
-							
-							if (row == null)
-							{
-								inbox.ActionBlock.Complete();
-							}
 						}
 						catch (Exception exception)
 						{
-							if (_rowErrorOutbox == null)
+							if (_rowErrorOutbox.ActionBlock == null)
 							{
 								throw; // no handlers -> blow up
 							}
 
-							if (row != null)
+							if (row == null)
 							{
-								row["Error"] = exception;
-								row["ErrorStep"] = PluginObject;
-								row["ErrorInbox"] = inbox;
+								row = new Row();
 							}
 
-							_rowErrorOutbox.ActionBlock.Post(row);
+							row["$Error:"] = true;
+							row["$Error:Step"] = Name;
+							row["$Error:Inbox"] = inbox.Name;
+							row["$Error:Message"] = exception.Message;
+							row["$Error:StackTrace"] = exception.StackTrace;
+							row["$Error:Name"] = exception.GetType().FullName;
+
+							_rowErrorOutbox.AddRow(row);
+						}
+						finally
+						{
+							// completion detection and handling
+
+							evaluateInboxCompletion(inbox);
 						}
 					},
 					new ExecutionDataflowBlockOptions
 					{
-						EnsureOrdered = true, // completing blocks with null rows depends on this
-						CancellationToken = _run.CancellationToken // force stopping the engine depends on this
+						CancellationToken = _run.CancellationToken
 					});
-					
-					inbox
-						.ActionBlock
-						.Completion
-						.ContinueWith(x => _rowErrorOutbox?.AddRow(null), _run.CancellationToken);
 					
 					if (inbox.FromOutbox != null)
 					{
@@ -256,7 +280,17 @@ namespace FineDataFlow.Engine.Implementations
 					Inboxes
 						.AsParallel()
 						.Where(inbox => inbox is ISeedInbox)
-						.ForAll(inbox => inbox.ActionBlock.Post(null));
+						.ForAll(seedInbox =>
+						{
+							var seedRow = new Row();
+							seedRow["$Seed:"] = true;
+							seedInbox.ActionBlock.Post(seedRow);
+						});
+
+					Inboxes
+						.AsParallel()
+						.Where(inbox => inbox is not ISeedInbox)
+						.ForAll(notSeedInbox => evaluateInboxCompletion(notSeedInbox));
 				})
 			);
 
@@ -264,17 +298,23 @@ namespace FineDataFlow.Engine.Implementations
 
 			await Task
 				.WhenAll(runnableTasks)
-				.ContinueWith(t => _stepCompleteOutbox?.AddRow(null), _run.CancellationToken);
+				.ContinueWith(t =>
+				{
+					var stepCompleteRow = new Row();
+					stepCompleteRow["$StepComplete:"] = true;
+					stepCompleteRow["$StepComplete:Step"] = Name;
+					//TODO:Add other relvant info, e.g. TotalInput,TotalOutput,Rows/Sec,e.t.c
+					_stepCompleteOutbox.AddRow(stepCompleteRow);
+
+				}, _run.CancellationToken);
 		}
 
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
-
 			PluginType
-				.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
-				.AsParallel()
-				.ForAll(async method =>
+				?.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+				?.AsParallel()
+				?.ForAll(async method =>
 				{
 					var attribute = method.GetCustomAttribute<DestroyAttribute>();
 
