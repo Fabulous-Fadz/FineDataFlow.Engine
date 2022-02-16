@@ -36,7 +36,7 @@ jobs:
         PROJECT_FILE_PATH: FineDataFlow.Engine.Abstractions/10.FineDataFlow.Engine.Abstractions.csproj
         PACKAGE_NAME: FineDataFlow.Engine.Abstractions
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        INCLUDE_SYMBOLS: false
+        INCLUDE_SYMBOLS: true
 
     - name: Publish Main (on version change)
       id  : fine_dataflow_engine
@@ -45,4 +45,4 @@ jobs:
         PROJECT_FILE_PATH: FineDataFlow.Engine/20.FineDataFlow.Engine.csproj
         PACKAGE_NAME: FineDataFlow.Engine
         NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        INCLUDE_SYMBOLS: false
+        INCLUDE_SYMBOLS: true

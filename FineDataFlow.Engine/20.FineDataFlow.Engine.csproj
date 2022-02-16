@@ -1,15 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.0.11</Version>
 		<LangVersion>latest</LangVersion>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<AssemblyName>FineDataFlow.Engine</AssemblyName>
 		<RootNamespace>FineDataFlow.Engine</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<Version>0.0.12</Version>
+		<Authors>FortuneN</Authors>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/FortuneN/FineDataFlow.Engine</PackageProjectUrl>
-		<PackageLicenseUrl>https://github.com/FortuneN/FineDataFlow.Engine/blob/master/LICENSE</PackageLicenseUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,11 +29,16 @@
 	
 	<ItemGroup>
 	  <None Include="..\.editorconfig" Link=".editorconfig" />
+	  <None Include="..\LICENSE" Link="LICENSE" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="fasterflect" Version="3.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	  <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
 	  <PackageReference Include="System.Threading.Tasks.Dataflow" Version="6.0.0" />
 	</ItemGroup>
